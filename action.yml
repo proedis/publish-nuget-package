@@ -1,0 +1,52 @@
+name: 'Publish NuGet Package'
+description: 'Restore, build and pack a .csproj and publish the NuGet Package on private registry'
+author: 'Proedis'
+
+inputs:
+  project-folder:
+    description: 'The folder that is containing the .csproj file'
+  project-file:
+    description: 'The project main file name, including the .csproj extension'
+  registry-url:
+    description: 'The URL of the Private Registry into push the packed project'
+  registry-api-key:
+    description: 'The ApiKey to use while pushing the package'
+  nuget-version:
+    description: 'The NuGet Version to use'
+    default: 'latest'
+  dotnet-version:
+    description: 'The DotNet Version to use'
+    default: '6.x'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Checkout Branch
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+        
+    - name: Setup .NET SDK ${{ inputs.dotnet-version }}
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: ${{ inputs.dotnet-version }}
+        
+    - name: Setup NuGet CLI ${{ inputs.nuget-version }}
+      uses: NuGet/setup-nuget@v1.1.1
+      with:
+        nuget-version: ${{ inputs.nuget-version }}
+        
+    - name: Compute Version using NerdBank.GitVersioning
+      uses: dotnet/nbgv@v0.4
+      id: nbgv
+      with:
+        path: ${{ inputs.project-folder }}
+        
+    - name: Build Project ${{ inputs.project-file }}
+      run: dotnet build '${{ inputs.project-folder }}/${{ inputs.project-file }}' -c Release -p:Version=${{ steps.nbgv.outputs.SemVer2 }}
+      
+    - name: Pack Project ${{ inputs.project-file }}
+      run: nuget pack '${{ inputs.project-folder }}/${{ inputs.project-file }}' -Prop Configuration=Release -IncludeReferencedProjects -Version ${{ steps.nbgv.outputs.SemVer2 }}
+      
+    - name: Publish Package
+      run: dotnet nuget push *.nupkg -k ${{ inputs.registry-url }} -s ${{ inputs.registry-api-key }}
