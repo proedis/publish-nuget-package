@@ -49,5 +49,5 @@ runs:
       shell: bash
       
     - name: Publish Package
-      run: dotnet nuget push *.nupkg -k https://nuget.registry.proedis.net/v3/index.json -s ${{ inputs.registry-api-key }}
+      run: dotnet nuget push *.nupkg -k ${{ inputs.registry-api-key }} -s https://nuget.registry.proedis.net/v3/index.json
       shell: bash
