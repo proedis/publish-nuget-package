@@ -1,4 +1,4 @@
-name: 'Publish NuGet Package'
+name: 'Publish NuGet Package on Proedis Registry'
 description: 'Restore, build and pack a .csproj and publish the NuGet Package on private registry'
 author: 'Proedis'
 
@@ -7,8 +7,6 @@ inputs:
     description: 'The folder that is containing the .csproj file'
   project-file:
     description: 'The project main file name, including the .csproj extension'
-  registry-url:
-    description: 'The URL of the Private Registry into push the packed project'
   registry-api-key:
     description: 'The ApiKey to use while pushing the package'
   nuget-version:
@@ -49,4 +47,4 @@ runs:
       run: nuget pack '${{ inputs.project-folder }}/${{ inputs.project-file }}' -Prop Configuration=Release -IncludeReferencedProjects -Version ${{ steps.nbgv.outputs.SemVer2 }}
       
     - name: Publish Package
-      run: dotnet nuget push *.nupkg -k ${{ inputs.registry-url }} -s ${{ inputs.registry-api-key }}
+      run: dotnet nuget push *.nupkg -k https://nuget.registry.proedis.net/v3/index.json -s ${{ inputs.registry-api-key }}
