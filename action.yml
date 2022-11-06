@@ -42,9 +42,12 @@ runs:
         
     - name: Build Project ${{ inputs.project-file }}
       run: dotnet build '${{ inputs.project-folder }}/${{ inputs.project-file }}' -c Release -p:Version=${{ steps.nbgv.outputs.SemVer2 }}
+      shell: bash
       
     - name: Pack Project ${{ inputs.project-file }}
       run: nuget pack '${{ inputs.project-folder }}/${{ inputs.project-file }}' -Prop Configuration=Release -IncludeReferencedProjects -Version ${{ steps.nbgv.outputs.SemVer2 }}
+      shell: bash
       
     - name: Publish Package
       run: dotnet nuget push *.nupkg -k https://nuget.registry.proedis.net/v3/index.json -s ${{ inputs.registry-api-key }}
+      shell: bash
