@@ -1,5 +1,5 @@
 name: 'Publish NuGet Package on Proedis Registry'
-description: 'Restore, build and pack a .csproj and publish the NuGet Package on private registry'
+description: 'Restore, build and pack a .csproj and publish the NuGet Package on Proedis Private Registry'
 author: 'Proedis'
 
 inputs:
